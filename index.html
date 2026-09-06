@@ -267,49 +267,13 @@
             
             <h3 style="margin-top:30px;">Résultat de l'IA (Choix du Jury)</h3>
             <textarea id="input-signature" rows="5" placeholder="Collez ici l'expérience signature validée par le jury..."></textarea>
-            <button onclick="validateStep(3)">Valider et générer l'étape 4 ➔</button>
-        </div>
-
-        <!-- ETAPE 4 : IDENTITE VISUELLE -->
-        <div id="step4" class="step-section">
-            <h2>Vote 4 : L'Identité Visuelle (DA)</h2>
-            <p class="subtitle">Intégration du concept et de l'expérience signature.</p>
-            
-            <div class="prompt-box" id="prompt-da"></div>
-            
-            <div class="action-group">
-                <button class="secondary" onclick="copyPrompt('prompt-da', this)">📋 Copier le prompt</button>
-            </div>
-            
-            <h3 style="margin-top:30px;">Résultat de l'IA (Choix du Jury)</h3>
-            <textarea id="input-da" rows="5" placeholder="Collez ici la Direction Artistique validée..."></textarea>
-            <button onclick="validateStep(4)">Valider et générer l'étape 5 ➔</button>
-        </div>
-
-        <!-- ETAPE 5 : GESTION DES IMPREVUS -->
-        <div id="step5" class="step-section">
-            <h2>Vote 5 : L'Imprévu</h2>
-            <p class="subtitle">Contrainte ou un imprévu de dernière minute.</p>
-            
-            <input type="text" id="input-imprevu-text" placeholder="Ex: Une alerte orage violent oblige à fermer la scène principale...">
-            <button onclick="generateImprevuPrompt()" style="margin-bottom: 20px;">Générer le prompt de crise ⚡</button>
-            
-            <div id="imprevu-container" style="display:none;">
-                <div class="prompt-box" id="prompt-imprevu"></div>
-                <div class="action-group">
-                    <button class="secondary" onclick="copyPrompt('prompt-imprevu', this)">📋 Copier le prompt</button>
-                </div>
-                
-                <h3 style="margin-top:30px;">Stratégie choisie par le Jury</h3>
-                <textarea id="input-strategy" rows="5" placeholder="Collez ici la stratégie de crise validée..."></textarea>
-                <button onclick="validateStep(5)">GÉNÉRER LE PROMPT FINAL GAMMA.APP 🚀</button>
-            </div>
+            <button onclick="validateStep(3)">Valider et générer le Grand Final 🚀</button>
         </div>
 
         <!-- ETAPE FINALE : MEGA PROMPT GAMMA -->
-        <div id="step6" class="step-section">
+        <div id="step4" class="step-section">
             <h2>🎉 Le Grand Final : Dossier de Production</h2>
-            <p class="subtitle">Ce prompt compile la totalité de l'oral pour générer la présentation client.</p>
+            <p class="subtitle">L'IA compile l'oral et invente la logistique, la DA et la crise pour générer la présentation client.</p>
             
             <div class="prompt-box" id="prompt-final" style="max-height: 400px; border-color: #4cc9f0;"></div>
             
@@ -374,10 +338,7 @@
         let appState = {
             briefText: "",
             concept: "",
-            signature: "",
-            da: "",
-            imprevu: "",
-            strategy: ""
+            signature: ""
         };
 
         function selectBrief(type, element) {
@@ -458,167 +419,45 @@ Ne recommande aucune proposition : le jury doit choisir.`;
                 appState.signature = document.getElementById('input-signature').value;
                 if(!appState.signature) return alert("Veuillez coller la réponse de l'IA !");
                 
-                document.getElementById('prompt-da').innerText = `Tu es directeur artistique spécialisé dans la communication événementielle.
-Voici le projet défini par le jury :
-
-CONCEPT VALIDÉ :
-${appState.concept}
-
-EXPÉRIENCE SIGNATURE VALIDÉE :
-${appState.signature}
-
-Imagine exactement trois directions artistiques distinctes pour représenter cet événement.
-Règles obligatoires :
-- les trois directions doivent respecter le brief et les choix du jury ;
-- elles doivent traduire le même concept, sans le modifier ;
-- elles doivent être adaptées au public de l’événement ;
-- elles doivent pouvoir être déclinées sur une affiche, une invitation, un site internet, les réseaux sociaux et la scénographie ;
-- elles doivent être suffisamment différentes pour permettre un véritable choix ;
-- elles ne doivent reprendre aucune marque ou œuvre existante.
-
-Pour chaque direction, indique uniquement :
-1. NOM DE LA DIRECTION : 3 mots maximum ;
-2. STYLE : une phrase ;
-3. PALETTE : 4 couleurs avec leurs codes HEX ;
-4. ÉLÉMENTS VISUELS : 3 éléments maximum ;
-5. AMBIANCE : 3 adjectifs ;
-6. INTENTION : ce que le public doit ressentir en découvrant l’identité.
-
-Chaque proposition doit faire moins de 70 mots.
-Ne crée pas encore de slogan.
-Ne modifie pas le nom de l’événement.
-Ne recommande aucune direction : le jury doit choisir.`;
+                generateFinalPrompt();
                 showStep('step4');
             }
-
-            else if (currentStep === 4) {
-                appState.da = document.getElementById('input-da').value;
-                if(!appState.da) return alert("Veuillez coller la réponse de l'IA !");
-                showStep('step5');
-            }
-
-            else if (currentStep === 5) {
-                appState.strategy = document.getElementById('input-strategy').value;
-                if(!appState.strategy) return alert("Veuillez coller la réponse de l'IA !");
-                
-                generateFinalPrompt();
-                showStep('step6');
-            }
-        }
-
-        function generateImprevuPrompt() {
-            appState.imprevu = document.getElementById('input-imprevu-text').value;
-            if(!appState.imprevu) return alert("Saisissez d'abord l'imprévu dicté par le jury !");
-            
-            document.getElementById('prompt-imprevu').innerText = `Tu es directeur de production et responsable de la gestion des risques événementiels.
-
-Voici le projet validé :
-${appState.briefText}
-
-Un imprévu survient :
-${appState.imprevu}
-
-Propose exactement trois stratégies de réponse distinctes et réalistes.
-
-Les trois stratégies doivent :
-- préserver en priorité la sécurité des participants et des équipes ;
-- respecter les obligations légales et les décisions des autorités compétentes ;
-- préserver autant que possible les objectifs de l’événement ;
-- tenir compte du programme, du budget et de l’expérience signature ;
-- être suffisamment différentes pour nécessiter un véritable arbitrage ;
-- ne jamais présenter une estimation comme un devis confirmé.
-
-Pour chaque stratégie, indique uniquement :
-1. STRATÉGIE : un titre de 4 mots maximum ;
-2. ACTION : la solution en 2 phrases maximum ;
-3. EXPÉRIENCE : la conséquence principale pour les participants ;
-4. BUDGET : impact faible, moyen ou élevé, avec une courte justification ;
-5. AVANTAGE : le bénéfice principal ;
-6. RISQUE : le principal risque résiduel.
-
-Ne choisis pas de stratégie.
-Ne modifie pas encore le projet.
-Signale si une décision nécessite obligatoirement la validation d’un professionnel, d’une autorité ou d’un responsable humain.`;
-            
-            document.getElementById('imprevu-container').style.display = "block";
         }
 
         function generateFinalPrompt() {
-            document.getElementById('prompt-final').innerText = `Crée une présentation professionnelle de recommandation événementielle, en français et au format 16:9.
+            document.getElementById('prompt-final').innerText = `Agis comme un Directeur de Production Événementielle. Crée une présentation professionnelle de recommandation (Pitch Deck) en français.
 
-Tu travailles à partir de cinq décisions validées par le jury.
-
-IMPORTANT :
-- Les contenus ci-dessous sont définitifs.
-- Conserve chaque réponse dans son intégralité.
-- Ne modifie pas les décisions prises.
-- Ne remplace pas le nom, le concept, l’expérience signature, la direction artistique ou la stratégie choisie.
-- Ne présente pas les options qui ont été rejetées.
-- Complète seulement les informations nécessaires à la construction du projet.
-- Toute information ajoutée doit être réaliste et cohérente avec le budget, la jauge, le public et les contraintes.
-- N’invente aucun devis, prestataire confirmé, disponibilité ou autorisation.
-- Ne mentionne ni les votes, ni le jury, ni les outils d’intelligence artificielle.
-- Présente le résultat comme une recommandation d’agence destinée à un client.
+Tu travailles à partir de 3 éléments validés par mon client.
 
 ────────────────────
-
-1. BRIEF VALIDÉ
+1. LE BRIEF :
 ${appState.briefText}
 
-────────────────────
-
-2. CONCEPT CRÉATIF VALIDÉ
+2. LE CONCEPT VALIDÉ :
 ${appState.concept}
 
-────────────────────
-
-3. EXPÉRIENCE SIGNATURE VALIDÉE
+3. L'EXPÉRIENCE SIGNATURE VALIDÉE :
 ${appState.signature}
-
 ────────────────────
 
-4. DIRECTION ARTISTIQUE VALIDÉE
-${appState.da}
+MISSION :
+À partir de ces éléments, construis une recommandation complète. C'est à TOI d'inventer la Direction Artistique, les plannings logistiques, la gestion de crise et l'équipe pour prouver ton expertise.
 
-────────────────────
+Organise la présentation en 10 diapositives au format professionnel :
 
-5. IMPRÉVU ET STRATÉGIE VALIDÉE
+1. COUVERTURE : Nom de l’événement, date fictive et promesse accrocheuse.
+2. LE DÉFI (BRIEF) : Résumé des objectifs, de la cible et des contraintes.
+3. LE CONCEPT : Explication de l'idée créative et de l'univers.
+4. DIRECTION ARTISTIQUE : Invente l'identité visuelle (palette de couleurs précises, style des décors, ambiance lumière, moodboard imaginé).
+5. L’EXPÉRIENCE SIGNATURE : Détail de l'expérience centrale (participation et émotion).
+6. LE PARCOURS PARTICIPANT : Ce que vit l'invité (Teasing avant, Expérience pendant, Suivi après).
+7. PLANNING LOGISTIQUE : Dresse un tableau horaire réaliste séparé en 3 phases (Montage, Déroulé du Jour J, Démontage).
+8. FICHES CONTACTS (TEAM) : Invente une équipe de 4 référents fictifs (ex: Directeur technique, Chef Traiteur responsable, Responsable Sécurité) avec leurs rôles.
+9. GESTION DE CRISE (L'IMPRÉVU) : Invente un imprévu majeur réaliste lié à cet événement précis (ex: orage, coupure de courant, absentéisme) et détaille ton Plan B d'urgence pour sauver l'événement.
+10. BUDGET & RSE : Répartition des coûts pour respecter l'enveloppe exacte, et 3 engagements écologiques concrets.
 
-Imprévu :
-${appState.imprevu}
-
-Stratégie choisie :
-${appState.strategy}
-
-────────────────────
-
-MISSION
-
-À partir de ces cinq éléments, construis une recommandation événementielle complète, cohérente et convaincante.
-
-Organise la présentation en 10 diapositives :
-
-1. COUVERTURE : Nom de l’événement, promesse et visuel principal.
-2. LE BRIEF : Contexte, objectif, public, jauge, budget et contraintes.
-3. LE CONCEPT CRÉATIF : Nom, idée centrale, promesse et univers.
-4. L’EXPÉRIENCE PROPOSÉE : Expérience globale des participants et rôle du public.
-5. L’EXPÉRIENCE SIGNATURE : Fonctionnement, participation, émotion recherchée et place dans l’événement.
-6. LE PARCOURS PARTICIPANT : Expérience avant, pendant et après l’événement.
-7. LE PROGRAMME : Déroulé chronologique réaliste intégrant l’expérience signature.
-8. LE DISPOSITIF DE PRODUCTION : Type de lieu, espaces, scénographie, technique, équipe, sécurité, accessibilité et engagements environnementaux.
-9. COMMUNICATION, IDENTITÉ ET BUDGET : Direction artistique validée, déclinaisons de communication et répartition estimative du budget par grands postes. Le total doit correspondre exactement au budget du brief.
-10. GESTION DE L’IMPRÉVU : Incident, stratégie choisie, adaptations du programme, conséquences logistiques, impact budgétaire et communication de crise.
-
-DIRECTION VISUELLE
-- Applique la direction artistique validée à toute la présentation.
-- Respecte exactement la palette de couleurs fournie.
-- Utilise des titres courts et un style professionnel.
-- Privilégie les visuels, tableaux, frises et schémas.
-- Évite les longs paragraphes.
-- Utilise une seule idée principale par diapositive.
-- Prévois un emplacement pour intégrer le key visual déjà créé.
-- Indique clairement que les budgets sont estimatifs et doivent être confirmés par des devis.
-- Signale les hypothèses et les éléments nécessitant une validation humaine.`;
+TON (STYLE) :
+Rédige avec des phrases courtes, des listes à puces et un ton convaincant d'agence. Ne mentionne jamais l'IA ou les "votes".`;
         }
 
         function showStep(id) {
